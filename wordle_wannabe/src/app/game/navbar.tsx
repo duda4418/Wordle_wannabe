@@ -10,7 +10,7 @@ const Navbar = () => {
         <InfoIcon />
       </div>
       <div className="navbar-center">
-        <span className="font-bold text-4xl font-serif">WORDLE</span>
+        <span className="font-bold text-4xl font-serif">Wordle</span>
       </div>
       <div className="navbar-end">
         <div className='mx-3 p-4'>
