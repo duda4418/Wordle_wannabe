@@ -3,48 +3,69 @@ import React, { useEffect, useState } from 'react';
 import LetterBox from './boxLetter'
 
 const WordleGame = ({letterList}:any) => {
-    console.log(letterList)
     
-    const searchedWordList = ['C', 'A', 'N', 'O', 'E'];
+    const searchedWordList = ['C', 'A', 'A', 'O', 'E'];
     const [input, setInput] = useState<string>('');
     
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             const { key } = event;
-            
+            //Handle enter key
             if (key === 'Enter') {
                 if (input.length == 5){
                     let letters: string[] = input.split('');
+                    const auxList = [...searchedWordList];
+                    const auxLetters = [...letters];
                     for(let i = 0; i < 30; i++){
                         if(letterList[i].letter === '' || letterList[i].letter === undefined){
-                            console.log("INTRA IN ENTER")
                             letterList[i-5].letter = letters[0];
-                            if (searchedWordList.includes(letters[0])){
-                                letterList[i-5].color = 'yellow';
-                                if(searchedWordList[i%5] == letters[0]){
-                                    letterList[i-5].color = 'green';
-                                }
-                            }
-                            else{
-                                letterList[i-5].color = 'gray';
+                            if(auxList[i%5] == letters[0]){
+                                letterList[i-5].color = 'green';
+                                auxList[i%5] = '-'
+                                auxLetters[i%5] = '-'
                             }
                             letters.shift();
-                        } else if(i>24){
+                        }else if(i>24){
                             letterList[i].letter = letters[0];
-                            if (searchedWordList.includes(letters[0])){
-                                letterList[i].color = 'yellow';
-                                if(searchedWordList[i%5] == letters[0]){
-                                    letterList[i].color = 'green';
-                                }
-                            }
-                            else{
-                                letterList[i].color = 'gray';
+                            if(auxList[i%5] == letters[0]){
+                                letterList[i].color = 'green';
+                                auxList[i%5] = '-'
+                                auxLetters[i%5] = '-'
                             }
                             letters.shift();
                         }
                     }
                     
-                    console.log(letterList)
+                    for(let i = 0; i < 30; i++){
+                        if(letterList[i].letter === '' || letterList[i].letter === undefined){
+                            if(auxLetters[0] != '-'){
+                                if (auxList.includes(auxLetters[0])){
+                                    letterList[i-5].letter = auxLetters[0]; 
+                                    letterList[i-5].color = 'yellow';
+                                    const index = auxList.indexOf(auxLetters[0])
+                                    auxList[index] = '-'
+                                }
+                                else{
+                                    letterList[i-5].color = 'gray';
+                                }
+                            }
+                            auxLetters.shift();
+                        }
+                        else if(i>24){
+                            if(auxLetters[0] != '-'){
+                                if (auxList.includes(auxLetters[0])){
+                                    letterList[i].letter = auxLetters[0]; 
+                                    letterList[i].color = 'yellow';
+                                    const index = auxList.indexOf(auxLetters[0])
+                                    auxList[index] = '-'
+                                }
+                                else{
+                                    letterList[i].color = 'gray';
+                                }
+                            }
+                            auxLetters.shift();
+                        }
+                    }
                     setInput('');
                 }
         } else if (key === 'Backspace') {
@@ -62,7 +83,7 @@ const WordleGame = ({letterList}:any) => {
         } else {
           // Handle other key presses
           if (input.length < 5) {
-            const uppercaseKey = key.toLocaleUpperCase(); // Convert key to uppercase
+            const uppercaseKey = key.toLocaleUpperCase(); 
             for(let i = 0; i < 30; i++){
                 if(letterList[i].letter === '' || letterList[i].letter === undefined){
                     letterList[i].letter = uppercaseKey;
@@ -81,12 +102,11 @@ const WordleGame = ({letterList}:any) => {
       return () => {
         window.removeEventListener('keydown', handleKeyDown);
       };
-    }, [input]); // Dependency array ensures useEffect runs when input changes
+    }, [input]); 
     return (
         <div>
             <p>{input}</p>
             <p>{input.length}</p>
-            {/* <CheckWord word={word} letterList = {letterList}/> */}
             <div className='flex flex-col items-center justify-center'>
                 {[...Array(6)].map((_, i) => (
                     <div className='flex flex-row'>
