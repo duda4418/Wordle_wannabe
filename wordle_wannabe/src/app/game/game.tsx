@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import LetterBox from './boxLetter'
 
 const WordleGame = ({letterList}:any) => {
+    console.log(letterList)
     
     const searchedWordList = ['C', 'A', 'N', 'O', 'E'];
     const [input, setInput] = useState<string>('');
@@ -16,10 +17,23 @@ const WordleGame = ({letterList}:any) => {
                     let letters: string[] = input.split('');
                     for(let i = 0; i < 30; i++){
                         if(letterList[i].letter === '' || letterList[i].letter === undefined){
+                            console.log("INTRA IN ENTER")
+                            letterList[i-5].letter = letters[0];
+                            if (searchedWordList.includes(letters[0])){
+                                letterList[i-5].color = 'yellow';
+                                if(searchedWordList[i%5] == letters[0]){
+                                    letterList[i-5].color = 'green';
+                                }
+                            }
+                            else{
+                                letterList[i-5].color = 'gray';
+                            }
+                            letters.shift();
+                        } else if(i>24){
                             letterList[i].letter = letters[0];
                             if (searchedWordList.includes(letters[0])){
                                 letterList[i].color = 'yellow';
-                                if(searchedWordList[i%6] == letters[0]){
+                                if(searchedWordList[i%5] == letters[0]){
                                     letterList[i].color = 'green';
                                 }
                             }
@@ -29,18 +43,35 @@ const WordleGame = ({letterList}:any) => {
                             letters.shift();
                         }
                     }
+                    
                     console.log(letterList)
+                    setInput('');
                 }
-          setInput('');
         } else if (key === 'Backspace') {
           // Handle Backspace key press
+          if(input){
+            for(let i = 0; i < 30; i++){
+                if(letterList[i].letter === '' || letterList[i].letter === undefined){
+                    letterList[i-1].letter = '';
+                    letterList[i-1].color = 'gray';
+                    break;
+                }
+            }
+        }
           setInput((prevInput) => prevInput.slice(0, -1));
         } else {
           // Handle other key presses
           if (input.length < 5) {
             const uppercaseKey = key.toLocaleUpperCase(); // Convert key to uppercase
+            for(let i = 0; i < 30; i++){
+                if(letterList[i].letter === '' || letterList[i].letter === undefined){
+                    letterList[i].letter = uppercaseKey;
+                    letterList[i].color = 'outline';
+                    break;
+                }
+            }
             setInput((prevInput) => prevInput + uppercaseKey);
-          }
+        }
         }
       };
   
@@ -54,6 +85,7 @@ const WordleGame = ({letterList}:any) => {
     return (
         <div>
             <p>{input}</p>
+            <p>{input.length}</p>
             {/* <CheckWord word={word} letterList = {letterList}/> */}
             <div className='flex flex-col items-center justify-center'>
                 {[...Array(6)].map((_, i) => (
