@@ -32,7 +32,7 @@ const LetterBox = ({letter, color}:any) => {
         </div>
       )}
       {color == 'outline' &&(
-        <div className="card  bg-stone-300 w-20 h-20 flex items-center justify-center ">
+        <div className="card card-bordered border-black border-4 bg-stone-300 w-20 h-20 flex items-center justify-center ">
             <div className="card-body flex items-center justify-center">
                 <h1 className='text-5xl font-extrabold'>{letter}</h1>
             </div>

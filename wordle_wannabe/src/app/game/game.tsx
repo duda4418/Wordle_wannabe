@@ -80,6 +80,10 @@ const WordleGame = ({ letterList }: any) => {
                             letterList[i - 1].letter = '';
                             letterList[i - 1].color = 'gray';
                             break;
+                        }else if(i==29){
+                            letterList[i].letter = '';
+                            letterList[i].color = 'gray';
+                            break;
                         }
                     }
                 }
@@ -136,8 +140,6 @@ const WordleGame = ({ letterList }: any) => {
                     </dialog>
                 </>
             )}
-            <p>{input}</p>
-            <p>{input.length}</p>
             <div className='flex flex-col items-center justify-center'>
                 {[...Array(6)].map((_, i) => (
                     <div className='flex flex-row' key={i}>
