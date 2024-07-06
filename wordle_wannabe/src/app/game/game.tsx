@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import LetterBox from './boxLetter';
 
-const WordleGame = ({ letterList }: any) => {
-    const searchedWordList = ['C', 'A', 'A', 'O', 'E'];
+const WordleGame = ({ letterList, random_word}:any) => {
+    const searchedWordList = random_word.word.split('');
     const [input, setInput] = useState<string>('');
     const [winning, setWinning] = useState(false);
     const [modalOpen, setModalOpen] = useState(false)

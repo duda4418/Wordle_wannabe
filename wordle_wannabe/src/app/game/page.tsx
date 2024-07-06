@@ -2,13 +2,16 @@ import React from 'react'
 import Navbar from './navbar'
 import WordleGame from './game'
 
-const PlayGame = () => {
+const PlayGame = async () => {
   interface LetterType {
     letter: string;
     color: string;
 }
 
 let letterList: LetterType[] = [];
+
+const res = await fetch('http://localhost:3000/api/');
+const random_word = await res.json();
 
 for(let i = 0; i < 30; i++){
     letterList.push({
@@ -19,7 +22,8 @@ for(let i = 0; i < 30; i++){
   return (
     <div>
         <Navbar/>
-        <WordleGame letterList={letterList}/>
+        <p>{random_word.word}</p>
+        <WordleGame letterList={letterList} random_word={random_word}/>
     </div>
   )
 }
