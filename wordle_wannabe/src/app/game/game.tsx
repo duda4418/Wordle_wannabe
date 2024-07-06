@@ -17,6 +17,8 @@ const WordleGame = ({ letterList, random_word}:any) => {
                     let letters: string[] = input.split('');
                     const auxList = [...searchedWordList];
                     const auxLetters = [...letters];
+                    let lastRow = 0
+                    let found = 0
                     for (let i = 0; i < 30; i++) {
                         if (letterList[i].letter === '' || letterList[i].letter === undefined) {
                             letterList[i - 5].letter = letters[0];
@@ -25,8 +27,15 @@ const WordleGame = ({ letterList, random_word}:any) => {
                                 auxList[i % 5] = '-';
                                 auxLetters[i % 5] = '-';
                             }
+                            if(found == 0){
+                                found = 1;
+                                lastRow = i
+                            }
                             letters.shift();
                         } else if (i > 24) {
+                            if(found == 0){
+                                lastRow = 30
+                            }
                             letterList[i].letter = letters[0];
                             if (auxList[i % 5] === letters[0]) {
                                 letterList[i].color = 'green';
@@ -64,7 +73,7 @@ const WordleGame = ({ letterList, random_word}:any) => {
                             auxLetters.shift();
                         }
                     }
-                    if (letterList.slice(25, 30).every((item: { color: string; }) => item.color === 'green')) {
+                    if (letterList.slice(lastRow-5, lastRow).every((item: { color: string; }) => item.color === 'green')) {
                         setWinning(true);
                         setModalOpen(true);
                     }else if(letterList.slice(25, 30).every((item: { color: string; }) => item.color != '')){

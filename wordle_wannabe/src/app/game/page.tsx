@@ -10,7 +10,7 @@ const PlayGame = async () => {
 
 let letterList: LetterType[] = [];
 
-const res = await fetch('http://localhost:3000/api/');
+const res = await fetch('http://localhost:3000/api/', {cache: 'no-store'});
 const random_word = await res.json();
 
 for(let i = 0; i < 30; i++){
