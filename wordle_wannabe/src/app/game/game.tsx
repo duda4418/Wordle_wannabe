@@ -8,79 +8,97 @@ const WordleGame = ({ letterList, random_word}:any) => {
     const [winning, setWinning] = useState(false);
     const [modalOpen, setModalOpen] = useState(false)
 
+    async function fetchWord(input:any) {
+        try {
+            const aux_word = input.toLowerCase()
+            const response = await fetch(`/api/checkword/${aux_word}`);
+            const data = await response.json();
+
+            console.log("Data:",data)
+            return data;
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             const { key } = event;
-
+            
             if (key === 'Enter') {
                 if (input.length === 5) {
-                    let letters: string[] = input.split('');
-                    const auxList = [...searchedWordList];
-                    const auxLetters = [...letters];
-                    let lastRow = 0
-                    let found = 0
-                    for (let i = 0; i < 30; i++) {
-                        if (letterList[i].letter === '' || letterList[i].letter === undefined) {
-                            letterList[i - 5].letter = letters[0];
-                            if (auxList[i % 5] === letters[0]) {
-                                letterList[i - 5].color = 'green';
-                                auxList[i % 5] = '-';
-                                auxLetters[i % 5] = '-';
+                    
+                    fetchWord(input).then(result => {
+                        if (result === true) {
+                            let letters: string[] = input.split('');
+                            const auxList = [...searchedWordList];
+                            const auxLetters = [...letters];
+                            let lastRow = 0
+                            let found = 0
+                            for (let i = 0; i < 30; i++) {
+                                if (letterList[i].letter === '' || letterList[i].letter === undefined) {
+                                    letterList[i - 5].letter = letters[0];
+                                    if (auxList[i % 5] === letters[0]) {
+                                        letterList[i - 5].color = 'green';
+                                        auxList[i % 5] = '-';
+                                        auxLetters[i % 5] = '-';
+                                    }
+                                    if(found == 0){
+                                        found = 1;
+                                        lastRow = i
+                                    }
+                                    letters.shift();
+                                } else if (i > 24) {
+                                    if(found == 0){
+                                        lastRow = 30
+                                    }
+                                    letterList[i].letter = letters[0];
+                                    if (auxList[i % 5] === letters[0]) {
+                                        letterList[i].color = 'green';
+                                        auxList[i % 5] = '-';
+                                        auxLetters[i % 5] = '-';
+                                    }
+                                    letters.shift();
+                                }
                             }
-                            if(found == 0){
-                                found = 1;
-                                lastRow = i
-                            }
-                            letters.shift();
-                        } else if (i > 24) {
-                            if(found == 0){
-                                lastRow = 30
-                            }
-                            letterList[i].letter = letters[0];
-                            if (auxList[i % 5] === letters[0]) {
-                                letterList[i].color = 'green';
-                                auxList[i % 5] = '-';
-                                auxLetters[i % 5] = '-';
-                            }
-                            letters.shift();
-                        }
-                    }
 
-                    for (let i = 0; i < 30; i++) {
-                        if (letterList[i].letter === '' || letterList[i].letter === undefined) {
-                            if (auxLetters[0] !== '-') {
-                                if (auxList.includes(auxLetters[0])) {
-                                    letterList[i - 5].letter = auxLetters[0];
-                                    letterList[i - 5].color = 'yellow';
-                                    const index = auxList.indexOf(auxLetters[0]);
-                                    auxList[index] = '-';
-                                } else {
-                                    letterList[i - 5].color = 'gray';
+                            for (let i = 0; i < 30; i++) {
+                                if (letterList[i].letter === '' || letterList[i].letter === undefined) {
+                                    if (auxLetters[0] !== '-') {
+                                        if (auxList.includes(auxLetters[0])) {
+                                            letterList[i - 5].letter = auxLetters[0];
+                                            letterList[i - 5].color = 'yellow';
+                                            const index = auxList.indexOf(auxLetters[0]);
+                                            auxList[index] = '-';
+                                        } else {
+                                            letterList[i - 5].color = 'gray';
+                                        }
+                                    }
+                                    auxLetters.shift();
+                                } else if (i > 24) {
+                                    if (auxLetters[0] !== '-') {
+                                        if (auxList.includes(auxLetters[0])) {
+                                            letterList[i].letter = auxLetters[0];
+                                            letterList[i].color = 'yellow';
+                                            const index = auxList.indexOf(auxLetters[0]);
+                                            auxList[index] = '-';
+                                        } else {
+                                            letterList[i].color = 'gray';
+                                        }
+                                    }
+                                    auxLetters.shift();
                                 }
                             }
-                            auxLetters.shift();
-                        } else if (i > 24) {
-                            if (auxLetters[0] !== '-') {
-                                if (auxList.includes(auxLetters[0])) {
-                                    letterList[i].letter = auxLetters[0];
-                                    letterList[i].color = 'yellow';
-                                    const index = auxList.indexOf(auxLetters[0]);
-                                    auxList[index] = '-';
-                                } else {
-                                    letterList[i].color = 'gray';
-                                }
+                            if (letterList.slice(lastRow-5, lastRow).every((item: { color: string; }) => item.color === 'green')) {
+                                setWinning(true);
+                                setModalOpen(true);
+                            }else if(letterList.slice(25, 30).every((item: { color: string; }) => item.color != '')){
+                                setWinning(false);
+                                setModalOpen(true)
                             }
-                            auxLetters.shift();
-                        }
-                    }
-                    if (letterList.slice(lastRow-5, lastRow).every((item: { color: string; }) => item.color === 'green')) {
-                        setWinning(true);
-                        setModalOpen(true);
-                    }else if(letterList.slice(25, 30).every((item: { color: string; }) => item.color != '')){
-                        setWinning(false);
-                        setModalOpen(true)
-                    }
-                    setInput('');
+                            setInput('');
+                    
+                    }})
                 }
             } else if (key === 'Backspace') {
                 if (input) {
@@ -151,6 +169,7 @@ const WordleGame = ({ letterList, random_word}:any) => {
                                 <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={()=>setModalOpen(false)}>✕</button>
                             </form>
                             <h3 className="font-bold text-lg">YOU LOST!</h3>
+                            <p>The word was {random_word.word}</p>
                             <button className="btn bg-black text-[#e3e3e1] hover:[#e3e3e1] hover:text-black hover:border-black
                                 m-7 px-16 rounded-full text-base" onClick={PlayAgain}>
                                 Play again

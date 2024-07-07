@@ -5,11 +5,11 @@ const prisma = new PrismaClient();
 
 export async function GET(){
     try {
-        const count = await prisma.word.count(); // Get the total count of words
-        const randomIndex = Math.floor(Math.random() * count); // Generate a random index
+        const count = await prisma.word.count(); 
+        const randomIndex = Math.floor(Math.random() * count); 
     
         let randomWord = await prisma.word.findFirst({
-            skip: randomIndex // Skip to the randomly generated index
+            skip: randomIndex 
         });
         if(randomWord)
             randomWord.word = randomWord.word.toUpperCase()
