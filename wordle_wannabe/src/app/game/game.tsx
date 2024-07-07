@@ -121,17 +121,24 @@ const WordleGame = ({ letterList, random_word}:any) => {
         };
     }, [input]);
 
+    const PlayAgain = () => {
+        window.location.reload();
+      }
+
     return (
         <div>
             {modalOpen && winning &&(
                 <>
                     <dialog id="my_modal_4" className="modal modal-open">
-                        <div className="modal-box">
+                        <div className="modal-box flex flex-col items-center">
                             <form method="dialog">
                                 <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={()=>setModalOpen(false)}>✕</button>
                             </form>
                             <h3 className="font-bold text-lg">YOU WON!</h3>
-                            <p className="py-4">Press ESC key or click on ✕ button to close</p>
+                            <button className="btn bg-black text-[#e3e3e1] hover:[#e3e3e1] hover:text-black hover:border-black
+                                m-7 px-16 rounded-full text-base" onClick={PlayAgain}>
+                                Play again
+                            </button>
                         </div>
                     </dialog>
                 </>
@@ -139,12 +146,15 @@ const WordleGame = ({ letterList, random_word}:any) => {
             {modalOpen && !winning &&(
                 <>
                     <dialog id="my_modal_4" className="modal modal-open">
-                        <div className="modal-box">
+                        <div className="modal-box flex flex-col items-center">
                             <form method="dialog">
                                 <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={()=>setModalOpen(false)}>✕</button>
                             </form>
                             <h3 className="font-bold text-lg">YOU LOST!</h3>
-                            <p className="py-4">Press ESC key or click on ✕ button to close</p>
+                            <button className="btn bg-black text-[#e3e3e1] hover:[#e3e3e1] hover:text-black hover:border-black
+                                m-7 px-16 rounded-full text-base" onClick={PlayAgain}>
+                                Play again
+                            </button>
                         </div>
                     </dialog>
                 </>
