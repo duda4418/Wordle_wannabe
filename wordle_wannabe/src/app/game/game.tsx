@@ -1,20 +1,21 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import LetterBox from './boxLetter';
+import Keyboard from './keyboard';
 
-const WordleGame = ({ letterList, random_word}:any) => {
+const WordleGame = ({ letterList, random_word }: any) => {
     const searchedWordList = random_word.word.split('');
     const [input, setInput] = useState<string>('');
     const [winning, setWinning] = useState(false);
-    const [modalOpen, setModalOpen] = useState(false)
+    const [modalOpen, setModalOpen] = useState(false);
 
-    async function fetchWord(input:any) {
+    async function fetchWord(input: any) {
         try {
-            const aux_word = input.toLowerCase()
+            const aux_word = input.toLowerCase();
             const response = await fetch(`/api/checkword/${aux_word}`);
             const data = await response.json();
 
-            console.log("Data:",data)
+            console.log("Data:", data);
             return data;
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -24,17 +25,16 @@ const WordleGame = ({ letterList, random_word}:any) => {
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             const { key } = event;
-            
+
             if (key === 'Enter') {
                 if (input.length === 5) {
-                    
                     fetchWord(input).then(result => {
                         if (result === true) {
                             let letters: string[] = input.split('');
                             const auxList = [...searchedWordList];
                             const auxLetters = [...letters];
-                            let lastRow = 0
-                            let found = 0
+                            let lastRow = 0;
+                            let found = 0;
                             for (let i = 0; i < 30; i++) {
                                 if (letterList[i].letter === '' || letterList[i].letter === undefined) {
                                     letterList[i - 5].letter = letters[0];
@@ -43,14 +43,14 @@ const WordleGame = ({ letterList, random_word}:any) => {
                                         auxList[i % 5] = '-';
                                         auxLetters[i % 5] = '-';
                                     }
-                                    if(found == 0){
+                                    if (found == 0) {
                                         found = 1;
-                                        lastRow = i
+                                        lastRow = i;
                                     }
                                     letters.shift();
                                 } else if (i > 24) {
-                                    if(found == 0){
-                                        lastRow = 30
+                                    if (found == 0) {
+                                        lastRow = 30;
                                     }
                                     letterList[i].letter = letters[0];
                                     if (auxList[i % 5] === letters[0]) {
@@ -89,16 +89,17 @@ const WordleGame = ({ letterList, random_word}:any) => {
                                     auxLetters.shift();
                                 }
                             }
-                            if (letterList.slice(lastRow-5, lastRow).every((item: { color: string; }) => item.color === 'green')) {
+                            if (letterList.slice(lastRow - 5, lastRow).every((item: { color: string; }) => item.color === 'green')) {
                                 setWinning(true);
                                 setModalOpen(true);
-                            }else if(letterList.slice(25, 30).every((item: { color: string; }) => item.color != '')){
+                            } else if (letterList.slice(25, 30).every((item: { color: string; }) => item.color != '')) {
                                 setWinning(false);
-                                setModalOpen(true)
+                                setModalOpen(true);
                             }
                             setInput('');
-                    
-                    }})
+
+                        }
+                    })
                 }
             } else if (key === 'Backspace') {
                 if (input) {
@@ -107,7 +108,7 @@ const WordleGame = ({ letterList, random_word}:any) => {
                             letterList[i - 1].letter = '';
                             letterList[i - 1].color = 'gray';
                             break;
-                        }else if(i==29){
+                        } else if (i == 29) {
                             letterList[i].letter = '';
                             letterList[i].color = 'gray';
                             break;
@@ -131,26 +132,32 @@ const WordleGame = ({ letterList, random_word}:any) => {
                 }
             }
         };
-        
+
         window.addEventListener('keydown', handleKeyDown);
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [input]);
+    }, [input, letterList, searchedWordList]);
 
     const PlayAgain = () => {
         window.location.reload();
-      }
+    }
+
+    const handleKeyPress = (key: any) => {
+        const event = new KeyboardEvent('keydown', { key });
+        window.dispatchEvent(event);
+    };
 
     return (
         <div>
-            {modalOpen && winning &&(
+            <p>{input}</p>
+            {modalOpen && winning && (
                 <>
                     <dialog id="my_modal_4" className="modal modal-open">
                         <div className="modal-box flex flex-col items-center">
                             <form method="dialog">
-                                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={()=>setModalOpen(false)}>✕</button>
+                                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setModalOpen(false)}>✕</button>
                             </form>
                             <h3 className="font-bold text-lg">YOU WON!</h3>
                             <button className="btn bg-black text-[#e3e3e1] hover:[#e3e3e1] hover:text-black hover:border-black
@@ -161,12 +168,12 @@ const WordleGame = ({ letterList, random_word}:any) => {
                     </dialog>
                 </>
             )}
-            {modalOpen && !winning &&(
+            {modalOpen && !winning && (
                 <>
                     <dialog id="my_modal_4" className="modal modal-open">
                         <div className="modal-box flex flex-col items-center">
                             <form method="dialog">
-                                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={()=>setModalOpen(false)}>✕</button>
+                                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setModalOpen(false)}>✕</button>
                             </form>
                             <h3 className="font-bold text-lg">YOU LOST!</h3>
                             <p>The word was {random_word.word}</p>
@@ -192,6 +199,7 @@ const WordleGame = ({ letterList, random_word}:any) => {
                     </div>
                 ))}
             </div>
+            <Keyboard onKeyPress={handleKeyPress} />
         </div>
     );
 }
