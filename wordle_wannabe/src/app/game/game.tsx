@@ -15,7 +15,6 @@ const WordleGame = ({ letterList, random_word }: any) => {
             const response = await fetch(`/api/checkword/${aux_word}`);
             const data = await response.json();
 
-            console.log("Data:", data);
             return data;
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -26,7 +25,7 @@ const WordleGame = ({ letterList, random_word }: any) => {
         const handleKeyDown = (event: KeyboardEvent) => {
             const { key } = event;
 
-            if (key === 'Enter') {
+            if (key === 'Enter' || key==='↪') {
                 if (input.length === 5) {
                     fetchWord(input).then(result => {
                         if (result === true) {
@@ -101,7 +100,7 @@ const WordleGame = ({ letterList, random_word }: any) => {
                         }
                     })
                 }
-            } else if (key === 'Backspace') {
+            } else if (key === 'Backspace' || key === '⌫') {
                 if (input) {
                     for (let i = 0; i < 30; i++) {
                         if (letterList[i].letter === '' || letterList[i].letter === undefined) {
@@ -199,7 +198,7 @@ const WordleGame = ({ letterList, random_word }: any) => {
                     </div>
                 ))}
             </div>
-            <Keyboard onKeyPress={handleKeyPress} />
+            <Keyboard onKeyPress={handleKeyPress} letterList={letterList} />
         </div>
     );
 }
