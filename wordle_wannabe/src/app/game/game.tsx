@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import LetterBox from './boxLetter';
 import Keyboard from './keyboard';
+import {toast} from "sonner"
 
 const WordleGame = ({ letterList, random_word }: any) => {
     console.log(random_word.word)
@@ -102,6 +103,8 @@ const WordleGame = ({ letterList, random_word }: any) => {
                                 }, 800);
                             }
                             setInput('');
+                        }else {
+                            toast(<div className='font-bold text-base'>Your word is not in the word list</div>)
                         }
                     })
                 }
