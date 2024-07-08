@@ -1,5 +1,5 @@
 import React from 'react'
-import Navbar from './navbar'
+import Navbar from './navbar/navbar'
 import WordleGame from './game'
 
 const PlayGame = async () => {
