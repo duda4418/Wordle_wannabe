@@ -13,7 +13,6 @@ const Keyboard = ({ onKeyPress, letterList }: any) => {
       onKeyPress(key);
     }
   };
-  console.log(keys)
 
   for (let i = 0; i < 30; i++) {
     if (letterList[i].color === "" || letterList[i].color === undefined) {
@@ -65,11 +64,11 @@ const Keyboard = ({ onKeyPress, letterList }: any) => {
   const getColorClass = (color: string) => {
     switch (color) {
         case 'green':
-            return 'bg-green-500 hover:bg-green-600 text-white';
+            return 'bg-lime-500 hover:bg-lime-600 text-white';
         case 'yellow':
             return 'bg-yellow-500 hover:bg-yellow-600 text-white';
         case 'black':
-            return 'bg-gray-600 hover:bg-yellow-600 text-white';
+            return 'bg-gray-600 hover:bg-black-700 text-white';
         case 'gray':
             default:
         return 'bg-gray-200 hover:bg-gray-300 text-gray-800';

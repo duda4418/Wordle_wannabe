@@ -4,6 +4,8 @@ import LetterBox from './boxLetter';
 import Keyboard from './keyboard';
 
 const WordleGame = ({ letterList, random_word }: any) => {
+    console.log(random_word.word)
+
     const searchedWordList = random_word.word.split('');
     const [input, setInput] = useState<string>('');
     const [winning, setWinning] = useState(false);
@@ -150,7 +152,6 @@ const WordleGame = ({ letterList, random_word }: any) => {
 
     return (
         <div>
-            <p>{input}</p>
             {modalOpen && winning && (
                 <>
                     <dialog id="my_modal_4" className="modal modal-open">

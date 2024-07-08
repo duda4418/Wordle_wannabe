@@ -21,7 +21,6 @@ for(let i = 0; i < 30; i++){
   return (
     <div>
         <Navbar/>
-        <p>{random_word.word}</p>
         <WordleGame letterList={letterList} random_word={random_word}/>
     </div>
   )
