@@ -1,45 +1,43 @@
-import React from 'react'
+import React from 'react';
+import { motion } from 'framer-motion';
 
-const LetterBox = ({letter, color}:any) => {
+const LetterBox = ({ letter, color }: any) => {
+  
+  
+  const getColorClassName = (color: string) => {
+    switch (color) {
+      case 'gray':
+        return 'bg-gray-200';
+      case 'yellow':
+        return 'bg-yellow-400';
+      case 'green':
+        return 'bg-lime-400';
+      case 'outline':
+        return 'bg-stone-300 border-black border-4 card-bordered';
+      default:
+        return 'bg-gray-200';
+    }
+  };
+      
+  const boxVariants = {
+    hidden: { opacity: 0, x: 100 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.5, type: 'spring' } }
+  };
+
   return (
-    <>
-      {color == '' &&(
-        <div className="card bg-gray-200 w-16 h-16 flex items-center justify-center">
-            <div className="card-body flex items-center justify-center">
-                <h1 className='text-4xl font-extrabold'>{letter}</h1>
-            </div>
-        </div>
-      )}
-      {color == 'gray' &&(
-        <div className="card bg-gray-200 w-16 h-16 flex items-center justify-center">
-            <div className="card-body flex items-center justify-center">
-                <h1 className='text-4xl font-extrabold'>{letter}</h1>
-            </div>
-        </div>
-      )}
-      {color == 'yellow' &&(
-        <div className="card bg-yellow-400 w-16 h-16 flex items-center justify-center">
-            <div className="card-body flex items-center justify-center">
-                <h1 className='text-4xl font-extrabold'>{letter}</h1>
-            </div>
-        </div>
-      )}
-      {color == 'green' &&(
-        <div className="card bg-lime-400 w-16 h-16 flex items-center justify-center">
-            <div className="card-body flex items-center justify-center">
-                <h1 className='text-4xl font-extrabold'>{letter}</h1>
-            </div>
-        </div>
-      )}
-      {color == 'outline' &&(
-        <div className="card card-bordered border-black border-4 bg-stone-300 w-16 h-16 flex items-center justify-center ">
-            <div className="card-body flex items-center justify-center">
-                <h1 className='text-4xl font-extrabold'>{letter}</h1>
-            </div>
-        </div>
-      )}
-    </>
-  )
-}
+    <motion.div
+      className={`card ${getColorClassName(color)} w-16 h-16 flex items-center justify-center`}
+      key={`${letter}-${color}`}
+      initial="hidden"
+      animate="visible"
+      variants={boxVariants}
+    >
+      <div className="card-body flex items-center justify-center">
+        <h1 className='text-4xl font-extrabold'>{letter}</h1>
+      </div>
+    </motion.div>
+  );
+};
 
-export default LetterBox
+
+export default LetterBox;

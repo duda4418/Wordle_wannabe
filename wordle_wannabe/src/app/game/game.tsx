@@ -91,14 +91,17 @@ const WordleGame = ({ letterList, random_word }: any) => {
                                 }
                             }
                             if (letterList.slice(lastRow - 5, lastRow).every((item: { color: string; }) => item.color === 'green')) {
-                                setWinning(true);
-                                setModalOpen(true);
+                                setTimeout(() => {
+                                    setWinning(true);
+                                    setModalOpen(true);
+                                }, 800);
                             } else if (letterList.slice(25, 30).every((item: { color: string; }) => item.color != '')) {
-                                setWinning(false);
-                                setModalOpen(true);
+                                setTimeout(() => {
+                                    setWinning(false);
+                                    setModalOpen(true);
+                                }, 800);
                             }
                             setInput('');
-
                         }
                     })
                 }
@@ -154,7 +157,7 @@ const WordleGame = ({ letterList, random_word }: any) => {
         <div>
             {modalOpen && winning && (
                 <>
-                    <dialog id="my_modal_4" className="modal modal-open">
+                    <dialog id="my_modal_4" className="modal modal-open ">
                         <div className="modal-box flex flex-col items-center">
                             <form method="dialog">
                                 <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setModalOpen(false)}>✕</button>
