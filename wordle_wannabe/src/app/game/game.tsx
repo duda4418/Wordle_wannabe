@@ -205,7 +205,8 @@ const WordleGame = ({ letterList, random_word }: any) => {
                     </div>
                 ))}
             </div>
-                <div className='pt-36 sm:pt-0'>
+    
+                <div className='pt-36 sm:pt-0 '>
                     <Keyboard onKeyPress={handleKeyPress} letterList={letterList} />
                 </div>
         </div>
