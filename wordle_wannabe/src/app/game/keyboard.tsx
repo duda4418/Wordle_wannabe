@@ -79,11 +79,11 @@ const Keyboard = ({ onKeyPress, letterList }: any) => {
     <div className="flex flex-col items-center space-y-2 mt-10">
       {keys.map((row, rowIndex) => (
         <div key={rowIndex} className="flex space-x-2">
-          {row.map((keyObj) => (
+         {row.map((keyObj) => (
             <button
               key={keyObj.letter}
               onClick={() => handleKeyPress(keyObj.letter)}
-              className={`font-semibold py-2 px-4 rounded shadow ${getColorClass(keyObj.color)}`}
+              className={`font-semibold sm:py-2 sm:px-4 px-3 py-3 rounded shadow ${getColorClass(keyObj.color)} `}
             >
               {keyObj.letter}
             </button>

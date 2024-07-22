@@ -21,7 +21,9 @@ for(let i = 0; i < 30; i++){
   return (
     <div>
         <Navbar/>
-        <WordleGame letterList={letterList} random_word={random_word}/>
+        <div className='sm:py-0 py-8'>
+          <WordleGame letterList={letterList} random_word={random_word}/>
+        </div>  
     </div>
   )
 }
