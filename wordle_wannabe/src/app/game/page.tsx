@@ -10,8 +10,19 @@ const PlayGame = async () => {
 
 let letterList: LetterType[] = [];
 
-const res = await fetch('http://localhost:3000/api/', {cache: 'no-store'});
-const random_word = await res.json();
+const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:4000';
+let random_word: { word: string } = { word: 'APPLE' };
+try {
+  const res = await fetch(`${apiBase}/word`, { cache: 'no-store' });
+  if (res.ok) {
+    const data = await res.json();
+    if (data?.word) random_word = { word: data.word };
+  } else {
+    console.error('Failed to fetch word:', res.status);
+  }
+} catch (e) {
+  console.error('Error fetching word', e);
+}
 for(let i = 0; i < 30; i++){
     letterList.push({
         letter: '',

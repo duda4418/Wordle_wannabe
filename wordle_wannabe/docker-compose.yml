@@ -1,0 +1,44 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-wordle}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wordle}
+      POSTGRES_DB: ${POSTGRES_DB:-wordledb}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://wordle:wordle@postgres:5432/wordledb}
+    depends_on:
+      - postgres
+    ports:
+      - "4000:4000"
+    develop:
+      watch:
+        - action: sync
+          path: ./backend/app
+          target: /app/app
+          ignore:
+            - __pycache__/
+        - action: rebuild
+          path: ./backend/requirements.txt
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    environment:
+      NEXT_PUBLIC_API_BASE: ${NEXT_PUBLIC_API_BASE:-http://localhost:4000}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+volumes:
+  pgdata:

@@ -15,12 +15,18 @@ const WordleGame = ({ letterList, random_word }: any) => {
     async function fetchWord(input: any) {
         try {
             const aux_word = input.toLowerCase();
-            const response = await fetch(`/api/checkword/${aux_word}`);
+            const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:4000';
+            const response = await fetch(`${apiBase}/checkword/${aux_word}`);
+            if(!response.ok){
+                console.error('Checkword fetch failed', response.status);
+                return false;
+            }
             const data = await response.json();
-
-            return data;
+            if(typeof data.valid === 'boolean') return data.valid;
+            return false;
         } catch (error) {
             console.error('Error fetching data:', error);
+            return false;
         }
     }
 
