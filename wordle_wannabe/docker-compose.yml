@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-wordle}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wordle}
-      POSTGRES_DB: ${POSTGRES_DB:-wordledb}
+      POSTGRES_DB: ${POSTGRES_DB:-wordle_wannabe_db}
     ports:
       - "5432:5432"
     volumes:
@@ -16,7 +16,7 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql://wordle:wordle@postgres:5432/wordledb}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://wordle:wordle@postgres:5432/wordle_wannabe_db}
     depends_on:
       - postgres
     ports:

@@ -1,7 +1,12 @@
 from fastapi import FastAPI, HTTPException
 import asyncpg, random, os
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://wordle:wordle@localhost:5432/wordledb")
+# Default fallback points to the new database name. Inside Docker network host is 'postgres'.
+# For local direct run (without compose) we still allow localhost fallback if user exports DATABASE_URL.
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://wordle:wordle@localhost:5432/wordle_wannabe_db"
+)
 
 app = FastAPI()
 
