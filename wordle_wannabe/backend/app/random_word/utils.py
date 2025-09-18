@@ -1,7 +1,5 @@
 import random
 
-from nltk.corpus.reader import wordlist
-
 
 def get_random_word(filtered_words):
 
@@ -9,5 +7,5 @@ def get_random_word(filtered_words):
     return {
         "id": selected_word["id"],
         "word": selected_word["words"],
-        "length": selected_word["length"]
+        "length": int(selected_word["length"]),
     }

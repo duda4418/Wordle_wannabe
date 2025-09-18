@@ -34,6 +34,6 @@ class WordList(Base):
             serialized_wordlist[str(word.id)] = {
                 "id": str(word.id),
                 "words": str(word.words),
-                "length": str(word.length)
+                "length": int(word.length)
             }
         return serialized_wordlist

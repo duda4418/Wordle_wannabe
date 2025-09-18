@@ -10,10 +10,10 @@ const PlayGame = async () => {
 
   let letterList: LetterType[] = []
 
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000'
-  let random_word: string = '';
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE 
+  let random_word: string = 'DOESNTWORK';
   try {
-    const res = await fetch(`${apiBase}/api/random_word?length=5`, { cache: 'no-store' })
+    const res = await fetch(`${apiBase}/random_word?length=5`, { cache: 'no-store' })
     if (!res.ok) {
       console.error('Failed to fetch word:', res.status, await res.text())
     } else {
