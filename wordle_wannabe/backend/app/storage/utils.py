@@ -7,3 +7,4 @@ def get_users(session):
 def get_wordlist(session):
     wordlist = session.query(WordList).all()
     return WordList.serialize_wordlist(wordlist)
+

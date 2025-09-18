@@ -1,13 +1,14 @@
 import os
-
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from app.storage.db_models import Base
 from app.storage.utils import get_users, get_wordlist
 
-engine = create_engine("postgresql://wordle:wordle@localhost:5432/wordle_wannabe_db", echo=True)
+load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://wordle:wordle@localhost:5432/wordle_wannabe_db")
+
+engine = create_engine(DATABASE_URL, echo=True, future=True)
 
 with engine.connect() as connection:
     Session = sessionmaker(bind=engine)
@@ -18,8 +19,8 @@ with engine.connect() as connection:
 class Database:
     def __init__(self):
         self.db = {
-            self.get_users(),
-            self.get_wordlist()
+            "users":self.get_users(),
+            "wordlist":self.get_wordlist()
         }
 
     @staticmethod
@@ -35,4 +36,3 @@ class Database:
         return get_wordlist(session=session)
 
 db = Database()
-
