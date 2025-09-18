@@ -146,7 +146,7 @@ const WordleGame = ({ letterList, random_word }: any) => {
     window.dispatchEvent(event)
   }
 
-   return (
+  return (
     <div>
       {modalOpen && winning && (
         <>
@@ -198,7 +198,6 @@ const WordleGame = ({ letterList, random_word }: any) => {
         <Keyboard onKeyPress={handleKeyPress} letterList={letterList} />
       </div>
     </div>
-   )
+  )
 }
-
 export default WordleGame
