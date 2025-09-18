@@ -1,165 +1,137 @@
-'use client'
-import React, { useEffect, useState } from 'react'
+"use client"
+import React, { useEffect, useMemo, useState } from 'react'
 import LetterBox from '@/app/game/boxLetter'
 import Keyboard from '@/app/game/keyboard'
 import { toast } from 'sonner'
 
+interface LetterCell { letter: string; color: string }
+
+const WORD_LENGTH = 5
+const MAX_ROWS = 6
+const TOTAL_CELLS = WORD_LENGTH * MAX_ROWS
+
 const WordleGame = ({ letterList, random_word }: any) => {
   console.log(random_word)
+  const answer = (typeof random_word === 'string' ? random_word : random_word?.word || '').toUpperCase()
 
-  const searchedWordList = random_word.split('')
-  const [input, setInput] = useState<string>('')
+  const initialBoard = useMemo<LetterCell[]>(() => {
+    if (Array.isArray(letterList) && letterList.length === TOTAL_CELLS) {
+      return letterList.map((c: any) => ({ letter: c.letter || '', color: c.color || '' }))
+    }
+    return Array.from({ length: TOTAL_CELLS }, () => ({ letter: '', color: '' }))
+  }, [letterList])
+
+  const [board, setBoard] = useState<LetterCell[]>(initialBoard)
+  const [input, setInput] = useState('')
+  const [row, setRow] = useState(0)
   const [winning, setWinning] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
 
-  async function fetchWord(input: any) {
-    try {
-      const aux_word = input.toLowerCase()
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE
-      const response = await fetch(`${apiBase}/check_word/${aux_word}`)
-      if (!response.ok) {
-        console.error('Checkword fetch failed', response.status)
-        return false
-      }
-      const data = await response.json()
-      if (typeof data.valid === 'boolean') return data.valid
-      return false
-    } catch (error) {
-      console.error('Error fetching data:', error)
-      return false
+  // (Optional) dictionary validation placeholder – currently treat any 5-letter input as valid
+  async function validateWord(word: string): Promise<boolean> {
+    // If you reintroduce /check_word, do fetch here; otherwise always true
+    return true
+  }
+
+  function applyGuess(guess: string) {
+    const upperGuess = guess.toUpperCase()
+    const next = [...board]
+    const rowStart = row * WORD_LENGTH
+
+    // Place letters (ensure we overwrite row with this guess)
+    for (let i = 0; i < WORD_LENGTH; i++) {
+      next[rowStart + i] = { letter: upperGuess[i], color: '' }
     }
+
+    // Prepare arrays for two-pass evaluation
+    const answerArr = answer.split('')
+    const guessArr = upperGuess.split('')
+
+    // First pass: greens
+    for (let i = 0; i < WORD_LENGTH; i++) {
+      if (guessArr[i] === answerArr[i]) {
+        next[rowStart + i].color = 'green'
+        answerArr[i] = '*' // consume
+        guessArr[i] = '_'  // mark processed
+      }
+    }
+    // Second pass: yellows & grays
+    for (let i = 0; i < WORD_LENGTH; i++) {
+      if (next[rowStart + i].color === 'green') continue
+      const idx = answerArr.indexOf(guessArr[i])
+      if (idx !== -1) {
+        next[rowStart + i].color = 'yellow'
+        answerArr[idx] = '*' // consume one occurrence
+      } else {
+        next[rowStart + i].color = 'gray'
+      }
+    }
+
+    setBoard(next)
+
+    const isRowWin = next.slice(rowStart, rowStart + WORD_LENGTH).every(c => c.color === 'green')
+    if (isRowWin) {
+      setTimeout(() => { setWinning(true); setModalOpen(true) }, 400)
+      return
+    }
+    if (row + 1 >= MAX_ROWS) {
+      setTimeout(() => { setWinning(false); setModalOpen(true) }, 400)
+    } else {
+      setRow(r => r + 1)
+    }
+  }
+
+  function handleEnter() {
+    if (input.length !== WORD_LENGTH || modalOpen) return
+    validateWord(input).then(valid => {
+      if (!valid) {
+        toast(<div className='font-bold text-base'>Word not in list</div>)
+        return
+      }
+      applyGuess(input)
+      setInput('')
+    })
+  }
+
+  function handleBackspace() {
+    if (modalOpen) return
+    if (!input) return
+    const next = [...board]
+    const posInRow = input.length - 1
+    const cellIndex = row * WORD_LENGTH + posInRow
+    next[cellIndex] = { letter: '', color: '' }
+    setBoard(next)
+    setInput(prev => prev.slice(0, -1))
+  }
+
+  function handleLetter(ch: string) {
+    if (modalOpen) return
+    if (input.length >= WORD_LENGTH) return
+    const next = [...board]
+    const cellIndex = row * WORD_LENGTH + input.length
+    next[cellIndex] = { letter: ch, color: 'outline' }
+    setBoard(next)
+    setInput(prev => prev + ch)
   }
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const { key } = event
-
-      if (key === 'Enter' || key === '↪') {
-        if (input.length === 5) {
-          fetchWord(input).then(result => {
-            if (result === true) {
-              let letters: string[] = input.split('')
-              const auxList = [...searchedWordList]
-              const auxLetters = [...letters]
-              let lastRow = 0
-              let found = 0
-              for (let i = 0; i < 30; i++) {
-                if (letterList[i].letter === '' || letterList[i].letter === undefined) {
-                  letterList[i - 5].letter = letters[0]
-                  if (auxList[i % 5] === letters[0]) {
-                    letterList[i - 5].color = 'green'
-                    auxList[i % 5] = '-'
-                    auxLetters[i % 5] = '-'
-                  }
-                  if (found == 0) {
-                    found = 1
-                    lastRow = i
-                  }
-                  letters.shift()
-                } else if (i > 24) {
-                  if (found == 0) {
-                    lastRow = 30
-                  }
-                  letterList[i].letter = letters[0]
-                  if (auxList[i % 5] === letters[0]) {
-                    letterList[i].color = 'green'
-                    auxList[i % 5] = '-'
-                    auxLetters[i % 5] = '-'
-                  }
-                  letters.shift()
-                }
-              }
-
-              for (let i = 0; i < 30; i++) {
-                if (letterList[i].letter === '' || letterList[i].letter === undefined) {
-                  if (auxLetters[0] !== '-') {
-                    if (auxList.includes(auxLetters[0])) {
-                      letterList[i - 5].letter = auxLetters[0]
-                      letterList[i - 5].color = 'yellow'
-                      const index = auxList.indexOf(auxLetters[0])
-                      auxList[index] = '-'
-                    } else {
-                      letterList[i - 5].color = 'gray'
-                    }
-                  }
-                  auxLetters.shift()
-                } else if (i > 24) {
-                  if (auxLetters[0] !== '-') {
-                    if (auxList.includes(auxLetters[0])) {
-                      letterList[i].letter = auxLetters[0]
-                      letterList[i].color = 'yellow'
-                      const index = auxList.indexOf(auxLetters[0])
-                      auxList[index] = '-'
-                    } else {
-                      letterList[i].color = 'gray'
-                    }
-                  }
-                  auxLetters.shift()
-                }
-              }
-              if (letterList.slice(lastRow - 5, lastRow).every((item: { color: string }) => item.color === 'green')) {
-                setTimeout(() => {
-                  setWinning(true)
-                  setModalOpen(true)
-                }, 800)
-              } else if (letterList.slice(25, 30).every((item: { color: string }) => item.color != '')) {
-                setTimeout(() => {
-                  setWinning(false)
-                  setModalOpen(true)
-                }, 800)
-              }
-              setInput('')
-            } else {
-              toast(<div className='font-bold text-base'>Your word is not in the word list</div>)
-            }
-          })
-        }
-      } else if (key === 'Backspace' || key === '⌫') {
-        if (input) {
-          for (let i = 0; i < 30; i++) {
-            if (letterList[i].letter === '' || letterList[i].letter === undefined) {
-              letterList[i - 1].letter = ''
-              letterList[i - 1].color = 'gray'
-              break
-            } else if (i == 29) {
-              letterList[i].letter = ''
-              letterList[i].color = 'gray'
-              break
-            }
-          }
-        }
-        setInput((prevInput) => prevInput.slice(0, -1))
-      } else {
-        if (input.length < 5) {
-          const uppercaseKey = key.toUpperCase()
-          if (/^[A-Z]$/.test(uppercaseKey)) {
-            for (let i = 0; i < 30; i++) {
-              if (letterList[i].letter === '' || letterList[i].letter === undefined) {
-                letterList[i].letter = uppercaseKey
-                letterList[i].color = 'outline'
-                break
-              }
-            }
-            setInput((prevInput) => prevInput + uppercaseKey)
-          }
-        }
-      }
+    const listener = (e: KeyboardEvent) => {
+      const key = e.key
+      if (key === 'Enter') return handleEnter()
+      if (key === 'Backspace') return handleBackspace()
+      const up = key.toUpperCase()
+      if (/^[A-Z]$/.test(up)) handleLetter(up)
     }
+    window.addEventListener('keydown', listener)
+    return () => window.removeEventListener('keydown', listener)
+  }, [input, board, row, modalOpen])
 
-    window.addEventListener('keydown', handleKeyDown)
+  const PlayAgain = () => { window.location.reload() }
 
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [input, letterList, searchedWordList])
-
-  const PlayAgain = () => {
-    window.location.reload()
-  }
-
-  const handleKeyPress = (key: any) => {
-    const event = new KeyboardEvent('keydown', { key })
-    window.dispatchEvent(event)
+  const handleKeyPress = (key: string) => {
+    if (key === 'ENTER') return handleEnter()
+    if (key === 'BACKSPACE') return handleBackspace()
+    if (/^[A-Z]$/.test(key)) handleLetter(key)
   }
 
    return (
@@ -187,7 +159,7 @@ const WordleGame = ({ letterList, random_word }: any) => {
                 <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setModalOpen(false)}>✕</button>
               </form>
               <h3 className="font-bold text-lg">YOU LOST!</h3>
-              <p>The word was {random_word.word}</p>
+              <p>The word was {answer}</p>
               <button className="btn bg-black text-[#e3e3e1] hover:[#e3e3e1] hover:text-black hover:border-black m-7 px-16 rounded-full text-base" onClick={PlayAgain}>
                 Play again
               </button>
@@ -201,8 +173,8 @@ const WordleGame = ({ letterList, random_word }: any) => {
             {[...Array(5)].map((_, index) => (
               <div className='m-1' key={index}>
                 <LetterBox
-                  letter={letterList[index + i * 5] ? letterList[index + i * 5].letter : ''}
-                  color={letterList[index + i * 5] ? letterList[index + i * 5].color : ''}
+                  letter={board[index + i * 5]?.letter || ''}
+                  color={board[index + i * 5]?.color || ''}
                 />
               </div>
             ))}
@@ -211,7 +183,7 @@ const WordleGame = ({ letterList, random_word }: any) => {
       </div>
 
       <div className='pt-36 sm:pt-0 '>
-        <Keyboard onKeyPress={handleKeyPress} letterList={letterList} />
+  <Keyboard onKeyPress={handleKeyPress} letterList={board} />
       </div>
     </div>
    )
