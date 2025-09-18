@@ -5,7 +5,6 @@
 -- JSON file expected at: /docker-entrypoint-initdb.d/data/wordlist.json
 -- IMPORTANT: Ensure the file exists BEFORE starting the postgres container the first time.
 
-\echo 'Starting WordList JSON seed (if needed)'
 
 -- Skip seeding if table already populated
 DO $$
@@ -41,5 +40,4 @@ WITH json_raw AS (
 )
 SELECT COUNT(*) AS inserted_rows FROM ins;
 
-\echo 'Completed WordList JSON seed'
 

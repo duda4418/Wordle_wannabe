@@ -124,3 +124,70 @@ Add a license file if you intend to open source.
 
 ---
 _Generated restructuring documentation._
+
+---
+## Updated Architecture (Port 8000 + WordList)
+
+Backend now runs on port `8000` and exposes a new endpoint:
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/random_word?length=5` | Returns a random word of the requested length |
+
+The legacy `/word` and `/checkword` endpoints are deprecated. Frontend should use `NEXT_PUBLIC_API_BASE=http://localhost:8000` and request `/api/random_word?length=5`.
+
+### Quick Run (Fresh Setup)
+```powershell
+Copy-Item .env.example .env
+docker compose up --build
+# Open: http://localhost:3000 (frontend)
+# Test backend health & random word:
+curl http://localhost:8000/health
+curl "http://localhost:8000/api/random_word?length=5"
+```
+
+### Resetting the Database Volume
+If you change SQL init scripts or need to re-run seed logic:
+```powershell
+docker compose down -v
+docker compose up --build
+```
+This removes the Postgres volume so `/docker-entrypoint-initdb.d/*.sql` re-executes.
+
+### Manual Seeding (Fallback)
+If automatic seeding was skipped you can exec into the DB container and run SQL manually:
+```powershell
+$container = (docker ps --filter "name=postgres" --format "{{.ID}}")
+docker exec -it $container psql -U $env:POSTGRES_USER -d $env:POSTGRES_DB -c "SELECT count(*) FROM \"WordList\";"
+```
+Or run a file:
+```powershell
+docker exec -i $container psql -U $env:POSTGRES_USER -d $env:POSTGRES_DB < backend/sql/01-init.sql
+```
+
+### Environment Variables (Updated)
+| Variable | Default | Notes |
+|----------|---------|-------|
+| `NEXT_PUBLIC_API_BASE` | `http://localhost:8000` | Frontend base for API |
+| `DATABASE_URL` | `postgresql://wordle:wordle@postgres:5432/wordle_wannabe_db` | In compose network |
+
+### Verifying Random Word Endpoint
+Expected JSON shape:
+```json
+{ "id": "<uuid>", "word": "apple", "length": 5 }
+```
+If you get 404: no words of that length exist (check seeding). If you get connection errors: ensure backend logs show successful DB connection.
+
+### Troubleshooting Addendum
+| Symptom | Cause | Action |
+|---------|-------|--------|
+| 404 on /api/random_word | Query param length mismatch or empty table | Confirm length int, check row count in "WordList" |
+| `No words found for length` | Filter returned empty list | Verify seed inserted words of that length |
+| ECONNREFUSED fetch in frontend | Wrong `NEXT_PUBLIC_API_BASE` | Update `.env.local` or `.env` to port 8000 |
+
+---
+## Roadmap (Next)
+1. Replace in-memory load with per-request SQLAlchemy session queries.
+2. Add pagination / length distribution stats endpoint.
+3. Add tests for `/api/random_word` (length filtering & 404 case).
+4. Add user guess submission endpoint with evaluation logic.
+

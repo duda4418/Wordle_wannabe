@@ -10,15 +10,15 @@ const PlayGame = async () => {
 
   let letterList: LetterType[] = []
 
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:4000'
-  let random_word: { word: string } = { word: 'APPLE' }
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000'
+  let random_word: string = '';
   try {
-    const res = await fetch(`${apiBase}/word`, { cache: 'no-store' })
-    if (res.ok) {
-      const data = await res.json()
-      if (data?.word) random_word = { word: data.word }
+    const res = await fetch(`${apiBase}/api/random_word?length=5`, { cache: 'no-store' })
+    if (!res.ok) {
+      console.error('Failed to fetch word:', res.status, await res.text())
     } else {
-      console.error('Failed to fetch word:', res.status)
+      const data = await res.json()
+      if (data?.word) random_word = data.word
     }
   } catch (e) {
     console.error('Error fetching word', e)
@@ -33,7 +33,7 @@ const PlayGame = async () => {
     <div>
       <Navbar />
       <div className='sm:py-0 py-8'>
-        <WordleGame letterList={letterList} random_word={random_word} />
+        <WordleGame letterList={letterList} random_word={random_word}  />
       </div>
     </div>
   )
