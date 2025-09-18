@@ -6,7 +6,7 @@ from app.storage.db_models import Base
 from app.storage.utils import get_users, get_wordlist
 
 load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://wordle:wordle@localhost:5432/wordle_wannabe_db")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(DATABASE_URL, echo=True, future=True)
 

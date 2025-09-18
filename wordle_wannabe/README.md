@@ -23,7 +23,7 @@ If the random word endpoint returns 404, the seed may not have run (see Reset DB
 | Layer | Tech | Path | Notes |
 |-------|------|------|-------|
 | Frontend | Next.js 14 + TS | `frontend/` | Fetches backend API |
-| Backend | FastAPI + SQLAlchemy | `backend/` | Provides `/health`, `/api/random_word` |
+| Backend | FastAPI + SQLAlchemy | `backend/` | Provides `/health`, `/api/random_word`, `/api/check_word` |
 | Database | Postgres 16 | Docker service | Seeded with word list into `"WordList"` |
 
 ### Environment Variables
